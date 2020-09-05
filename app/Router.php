@@ -1,35 +1,55 @@
 <?php
+    /* 
+        This class handles all the logic of the Routes, with the .htaccess, in order to contact the controllers.
+        An instance of this class protect the server resources and hide the file extensions.
+
+        The $host must be the default directory of the server, where index.php and .htaccess exists.
+    */
+
     require_once('Route.php');
-    require_once('controllers/Controller.php');
+    require_once('controllers/CreateView.php');
+    require_once('controllers/Api.php');
     
     class Router{
        
-        public function __construct(){
-            
+        public function __construct($host){
+            $this->host = $host;
             $this->validRoutes = array();
             
 
-            //please add more routes below here if you want, the Router will handle it.
+            
+            //index it's the default route.
+            $this->validRoutes[] = new Route('index', function(){
+                createView('index');
+            });
 
-            $this->validRoutes[] = new Route('contact', function(){
-                echo('contact function');
+            /*
+                Add more routes below here if you want, the Router will handle it. 
+            */
+
+            $this->validRoutes[] = new Route('public', function(){
+                createView('public');
             });
             
-            $this->validRoutes[] = new Route('index', function(){
-                echo('index function');
+            $this->validRoutes[] = new Route('about', function(){
+                createView('about');
             });
 
-            $this->validRoutes[] = new Route('about', function(){
-                Controller::createView();
+            $this->validRoutes[] = new Route('chat', function(){
+                createView('chat');
             });
-        
+
+            //this route uses the RESTful Api.
+            $this->validRoutes[] = new Route('api', function(){
+                api();
+            });
         
         
         }
 
-        //this function turns on the Router
+        //this function turns on the Router, and it wait for requests
         function listen($url){
-            $error = "ERROR:: 404. Page not found.";
+            $error = "ACCESS DENIED 401.";
             $missing = true;
             $i = 0;
             
@@ -40,10 +60,10 @@
                 }
                 $i++;
             }
+
+            //if the url do not exist in the router, this redirect the request to the index route
             if($missing){
-                echo('<h3>'.$error." URL: ".$url.'</h3>');
-                echo('<a href="http://localhost/ao/index">Home Page</a><br>');
-                echo('<a href="http://localhost/ao/public/index.html">Projects</a>');
+                header('location:'.$this->host.'/index');
             }
         }
 
