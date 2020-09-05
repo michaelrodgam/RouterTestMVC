@@ -1,3 +1,5 @@
-#Router simple config
+#Router simple config. 
+#This modify the URI in the Apache server.
+
 RewriteEngine On
 RewriteRule ^(.+)/? index.php?url=$1 [QSA,L]
